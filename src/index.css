@@ -852,3 +852,144 @@ body::before {
   transform: translateY(-3px);
   box-shadow: 0 0 20px rgba(46, 204, 113, 0.4);
 }
+
+/* Connect Wallet Screen */
+.connect-screen,
+.claim-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+}
+
+.connect-card,
+.claim-card {
+  padding: 40px;
+  text-align: center;
+  max-width: 420px;
+  width: 90%;
+}
+
+.connect-title {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 1.8rem;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+}
+
+.connect-subtitle {
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+}
+
+.connect-pet-preview,
+.claim-pet-preview {
+  width: 140px;
+  height: 140px;
+  margin: 24px auto;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 107, 53, 0.15) 0%, transparent 70%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.connect-pet-image,
+.claim-pet-image {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  object-position: 0 0;
+  image-rendering: pixelated;
+  animation: petBounce 1s ease-in-out infinite;
+}
+
+.connect-info {
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+  font-size: 0.9rem;
+}
+
+.connect-features {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.feature {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/* Claim Pet Screen */
+.claim-card h2 {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 1rem;
+  color: var(--accent-primary);
+  margin-bottom: 16px;
+}
+
+.returning-user,
+.new-user {
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+  line-height: 1.8;
+}
+
+.returning-user strong,
+.new-user strong {
+  color: var(--accent-warning);
+}
+
+.claim-btn {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 0.8rem;
+  padding: 20px 40px;
+  background: var(--gradient-primary);
+  border: none;
+  border-radius: var(--border-radius-md);
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin: 16px 0;
+}
+
+.claim-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-glow);
+}
+
+.claim-info {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  margin-top: 16px;
+}
+
+/* Loading Screen */
+.loading-screen {
+  padding: 40px;
+  text-align: center;
+  color: var(--text-secondary);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Wallet Stats in Game Over */
+.wallet-stats-summary {
+  margin: 16px 0;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: var(--border-radius-sm);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.wallet-stats-summary strong {
+  color: var(--accent-warning);
+}

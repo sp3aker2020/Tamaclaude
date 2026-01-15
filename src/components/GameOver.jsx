@@ -1,4 +1,4 @@
-export function GameOver({ score, highScores, onRestart }) {
+export function GameOver({ score, highScores, onRestart, walletStats }) {
     const causeMessages = {
         starvation: '💀 Died of starvation!',
         sadness: '💔 Died of sadness!',
@@ -6,7 +6,7 @@ export function GameOver({ score, highScores, onRestart }) {
     }
 
     const latestScore = highScores[0]
-    const isNewHighScore = latestScore && latestScore.score === score.current
+    const isNewHighScore = walletStats?.highScore && score.current > walletStats.highScore
 
     return (
         <div className="game-over-overlay">
@@ -23,7 +23,7 @@ export function GameOver({ score, highScores, onRestart }) {
                     <div className="final-score-label">Final Score</div>
                     <div className="final-score-value">
                         {score.current.toLocaleString()}
-                        {isNewHighScore && <span className="new-high-score">🏆 NEW HIGH!</span>}
+                        {isNewHighScore && <span className="new-high-score">🏆 NEW PERSONAL BEST!</span>}
                     </div>
                 </div>
 
@@ -38,9 +38,16 @@ export function GameOver({ score, highScores, onRestart }) {
                     </div>
                 </div>
 
+                {walletStats && walletStats.totalPets > 0 && (
+                    <div className="wallet-stats-summary">
+                        <p>Total pets raised: <strong>{walletStats.totalPets + 1}</strong></p>
+                        <p>Best score: <strong>{Math.max(walletStats.highScore || 0, score.current).toLocaleString()}</strong></p>
+                    </div>
+                )}
+
                 {highScores.length > 0 && (
                     <div className="high-scores">
-                        <h3>🏆 Top Scores</h3>
+                        <h3>🏆 Your Recent Runs</h3>
                         <div className="high-scores-list">
                             {highScores.slice(0, 5).map((hs, i) => (
                                 <div key={i} className={`high-score-row ${i === 0 ? 'top-score' : ''}`}>
@@ -54,7 +61,7 @@ export function GameOver({ score, highScores, onRestart }) {
                 )}
 
                 <button className="restart-btn" onClick={onRestart}>
-                    🐣 New Pet
+                    🐣 Adopt New Pet
                 </button>
             </div>
         </div>
