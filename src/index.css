@@ -182,20 +182,56 @@ body::before {
 }
 
 /* Pet states */
+.pet-sprite.action-sprite {
+  width: 160px;
+  height: 160px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
 .pet-sprite.eating {
-  animation: petEat 0.5s ease-in-out;
+  animation: petEat 0.8s ease-in-out infinite;
 }
 
 @keyframes petEat {
 
   0%,
   100% {
-    transform: scale(1);
+    transform: scale(1) rotate(0deg);
+  }
+
+  25% {
+    transform: scale(1.05) rotate(-3deg);
   }
 
   50% {
-    transform: scale(1.15);
+    transform: scale(1.1) rotate(0deg);
   }
+
+  75% {
+    transform: scale(1.05) rotate(3deg);
+  }
+}
+
+.pet-sprite.playing {
+  animation: petPlay 0.5s ease-in-out infinite;
+}
+
+@keyframes petPlay {
+
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+
+  50% {
+    transform: translateY(-15px) scale(1.05);
+  }
+}
+
+.pet-sprite.sleeping {
+  animation: petSleep 2s ease-in-out infinite;
 }
 
 .pet-sprite.playing {
