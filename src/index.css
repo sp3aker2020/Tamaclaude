@@ -993,3 +993,48 @@ body::before {
 .wallet-stats-summary strong {
   color: var(--accent-warning);
 }
+
+/* Pet History */
+.pet-history {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.pet-history h3 {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: var(--border-radius-sm);
+  font-size: 0.8rem;
+}
+
+.history-cause {
+  font-size: 1.2rem;
+}
+
+.history-score {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 0.65rem;
+  color: var(--accent-warning);
+}
+
+.history-time {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}

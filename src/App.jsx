@@ -27,7 +27,20 @@ function Particles() {
   )
 }
 
-function ClaimPetScreen({ onClaim, walletStats }) {
+function ClaimPetScreen({ onClaim, walletStats, petHistory }) {
+  const formatTime = (ms) => {
+    const seconds = Math.floor(ms / 1000)
+    const minutes = Math.floor(seconds / 60)
+    if (minutes > 0) return `${minutes}m ${seconds % 60}s`
+    return `${seconds}s`
+  }
+
+  const causeEmoji = {
+    starvation: '🍔',
+    sadness: '💔',
+    exhaustion: '😴'
+  }
+
   return (
     <div className="claim-screen">
       <div className="claim-card glass-card">
@@ -51,6 +64,21 @@ function ClaimPetScreen({ onClaim, walletStats }) {
         <button className="claim-btn" onClick={onClaim}>
           {walletStats && walletStats.totalPets > 0 ? '🎮 Start New Pet' : '🐣 Claim Your Pet'}
         </button>
+
+        {petHistory && petHistory.length > 0 && (
+          <div className="pet-history">
+            <h3>📜 Your Pet History</h3>
+            <div className="history-list">
+              {petHistory.slice(0, 5).map((pet, i) => (
+                <div key={i} className="history-item">
+                  <span className="history-cause">{causeEmoji[pet.causeOfDeath] || '💀'}</span>
+                  <span className="history-score">{pet.score?.toLocaleString()}</span>
+                  <span className="history-time">{formatTime(pet.timeAliveMs)}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <p className="claim-info">
           Keep your pet alive by feeding, playing, and letting it rest!
@@ -91,6 +119,7 @@ function App() {
 
   const [hasClaimed, setHasClaimed] = useState(false)
   const [walletStats, setWalletStats] = useState(null)
+  const [petHistory, setPetHistory] = useState([])
   const [loading, setLoading] = useState(true)
 
   const {
@@ -106,16 +135,19 @@ function App() {
       getWalletHistory(walletAddress)
         .then(data => {
           setWalletStats(data.stats)
-          // Auto-claim if they've played before or if pet is currently alive
-          const hasPlayedBefore = data.stats && data.stats.totalPets > 0
-          const petIsAlive = localStorage.getItem('tamaclaude-alive') !== 'false'
-          setHasClaimed(hasPlayedBefore || petIsAlive)
+          setPetHistory(data.history || [])
+          // Check wallet-specific localStorage for alive pet
+          const storageKey = `tamaclaude-${walletAddress.slice(0, 8)}-alive`
+          const petIsAlive = localStorage.getItem(storageKey) !== 'false' && localStorage.getItem(storageKey) !== null
+          // Auto-claim if they have a living pet in localStorage
+          setHasClaimed(petIsAlive && localStorage.getItem(storageKey) === 'true')
         })
         .catch(console.error)
         .finally(() => setLoading(false))
     } else {
       setHasClaimed(false)
       setWalletStats(null)
+      setPetHistory([])
       setLoading(false)
     }
   }, [connected, walletAddress])
@@ -161,7 +193,7 @@ function App() {
       <>
         <Particles />
         <div className="app-container">
-          <ClaimPetScreen onClaim={handleClaim} walletStats={walletStats} />
+          <ClaimPetScreen onClaim={handleClaim} walletStats={walletStats} petHistory={petHistory} />
         </div>
       </>
     )

@@ -30,88 +30,92 @@ const ACTION_EFFECTS = {
     sleep: { energy: 30, happiness: 5 }
 }
 
+// Helper to get wallet-specific localStorage key
+const getStorageKey = (walletAddress, key) => {
+    if (!walletAddress) return null
+    return `tamaclaude-${walletAddress.slice(0, 8)}-${key}`
+}
+
+// Helper to read from localStorage
+const readStorage = (walletAddress, key, defaultValue) => {
+    const storageKey = getStorageKey(walletAddress, key)
+    if (!storageKey) return defaultValue
+
+    const saved = localStorage.getItem(storageKey)
+    if (saved) {
+        try {
+            return JSON.parse(saved)
+        } catch {
+            return defaultValue
+        }
+    }
+    return defaultValue
+}
+
+// Helper to write to localStorage
+const writeStorage = (walletAddress, key, value) => {
+    const storageKey = getStorageKey(walletAddress, key)
+    if (storageKey) {
+        localStorage.setItem(storageKey, JSON.stringify(value))
+    }
+}
+
 export function usePetState(walletAddress = null) {
-    const [stats, setStats] = useState(() => {
-        const saved = localStorage.getItem('tamaclaude-stats')
-        if (saved) {
-            try {
-                return JSON.parse(saved)
-            } catch {
-                return INITIAL_STATS
-            }
-        }
-        return INITIAL_STATS
-    })
+    // Track the previous wallet to detect changes
+    const prevWalletRef = useRef(walletAddress)
 
-    // Game state
-    const [isAlive, setIsAlive] = useState(() => {
-        const saved = localStorage.getItem('tamaclaude-alive')
-        return saved !== 'false'
-    })
-
-    // Score tracking
-    const [score, setScore] = useState(() => {
-        const saved = localStorage.getItem('tamaclaude-score')
-        if (saved) {
-            try {
-                return JSON.parse(saved)
-            } catch {
-                return { actionsCompleted: 0, startTime: Date.now(), deathTime: null }
-            }
-        }
-        return { actionsCompleted: 0, startTime: Date.now(), deathTime: null }
-    })
-
-    // High scores
-    const [highScores, setHighScores] = useState(() => {
-        const saved = localStorage.getItem('tamaclaude-highscores')
-        if (saved) {
-            try {
-                return JSON.parse(saved)
-            } catch {
-                return []
-            }
-        }
-        return []
-    })
-
-    // Cooldown timestamps
-    const [cooldowns, setCooldowns] = useState(() => {
-        const saved = localStorage.getItem('tamaclaude-cooldowns')
-        if (saved) {
-            try {
-                return JSON.parse(saved)
-            } catch {
-                return { feed: 0, play: 0, sleep: 0 }
-            }
-        }
-        return { feed: 0, play: 0, sleep: 0 }
-    })
-
+    const [stats, setStats] = useState(INITIAL_STATS)
+    const [isAlive, setIsAlive] = useState(true)
+    const [score, setScore] = useState({ actionsCompleted: 0, startTime: Date.now(), deathTime: null })
+    const [highScores, setHighScores] = useState([])
+    const [cooldowns, setCooldowns] = useState({ feed: 0, play: 0, sleep: 0 })
     const [action, setAction] = useState(null)
     const [message, setMessage] = useState(null)
     const [, forceUpdate] = useState(0)
 
-    // Save states to localStorage
+    // Load state when wallet changes
     useEffect(() => {
-        localStorage.setItem('tamaclaude-stats', JSON.stringify(stats))
-    }, [stats])
+        if (walletAddress && walletAddress !== prevWalletRef.current) {
+            // Wallet changed - load new wallet's data
+            setStats(readStorage(walletAddress, 'stats', INITIAL_STATS))
+            setIsAlive(readStorage(walletAddress, 'alive', true))
+            setScore(readStorage(walletAddress, 'score', { actionsCompleted: 0, startTime: Date.now(), deathTime: null }))
+            setHighScores(readStorage(walletAddress, 'highscores', []))
+            setCooldowns(readStorage(walletAddress, 'cooldowns', { feed: 0, play: 0, sleep: 0 }))
+            setAction(null)
+            setMessage(null)
+        } else if (!walletAddress && prevWalletRef.current) {
+            // Wallet disconnected - reset to defaults
+            setStats(INITIAL_STATS)
+            setIsAlive(true)
+            setScore({ actionsCompleted: 0, startTime: Date.now(), deathTime: null })
+            setHighScores([])
+            setCooldowns({ feed: 0, play: 0, sleep: 0 })
+        }
+
+        prevWalletRef.current = walletAddress
+    }, [walletAddress])
+
+    // Save states to localStorage (wallet-specific)
+    useEffect(() => {
+        writeStorage(walletAddress, 'stats', stats)
+    }, [walletAddress, stats])
 
     useEffect(() => {
-        localStorage.setItem('tamaclaude-alive', String(isAlive))
-    }, [isAlive])
+        writeStorage(walletAddress, 'alive', isAlive)
+    }, [walletAddress, isAlive])
 
     useEffect(() => {
-        localStorage.setItem('tamaclaude-score', JSON.stringify(score))
-    }, [score])
+        writeStorage(walletAddress, 'score', score)
+    }, [walletAddress, score])
 
     useEffect(() => {
-        localStorage.setItem('tamaclaude-highscores', JSON.stringify(highScores))
-    }, [highScores])
+        writeStorage(walletAddress, 'highscores', highScores)
+    }, [walletAddress, highScores])
 
     useEffect(() => {
-        localStorage.setItem('tamaclaude-cooldowns', JSON.stringify(cooldowns))
-    }, [cooldowns])
+        writeStorage(walletAddress, 'cooldowns', cooldowns)
+    }, [walletAddress, cooldowns])
 
     // Check for death condition
     useEffect(() => {
@@ -196,7 +200,7 @@ export function usePetState(walletAddress = null) {
             return `${minutes}m ${seconds % 60}s`
         }
         return `${seconds}s`
-    }, [score.startTime])
+    }, [score.startTime, score.deathTime])
 
     // Restart game
     const restartGame = useCallback(() => {
@@ -209,7 +213,7 @@ export function usePetState(walletAddress = null) {
 
     // Decay stats over time (only if alive)
     useEffect(() => {
-        if (!isAlive) return
+        if (!isAlive || !walletAddress) return
 
         const interval = setInterval(() => {
             setStats(prev => ({
@@ -220,7 +224,7 @@ export function usePetState(walletAddress = null) {
         }, DECAY_INTERVAL)
 
         return () => clearInterval(interval)
-    }, [isAlive])
+    }, [isAlive, walletAddress])
 
     // Update display every second
     useEffect(() => {
@@ -281,7 +285,7 @@ export function usePetState(walletAddress = null) {
     }, [])
 
     const feed = useCallback(() => {
-        if (!isAlive) return
+        if (!isAlive || !walletAddress) return
 
         if (isOnCooldown('feed')) {
             setMessage(`Wait ${formatCooldown(getCooldownRemaining('feed'))}! 🍔`)
@@ -301,10 +305,10 @@ export function usePetState(walletAddress = null) {
         setMessage('Yummy! 🍔')
         startCooldown('feed')
         incrementActions()
-    }, [isAlive, stats.hunger, isOnCooldown, getCooldownRemaining, startCooldown, incrementActions])
+    }, [isAlive, walletAddress, stats.hunger, isOnCooldown, getCooldownRemaining, startCooldown, incrementActions])
 
     const play = useCallback(() => {
-        if (!isAlive) return
+        if (!isAlive || !walletAddress) return
 
         if (isOnCooldown('play')) {
             setMessage(`Wait ${formatCooldown(getCooldownRemaining('play'))}! 🎮`)
@@ -330,10 +334,10 @@ export function usePetState(walletAddress = null) {
         setMessage('Wheee! ✨')
         startCooldown('play')
         incrementActions()
-    }, [isAlive, stats.energy, stats.happiness, isOnCooldown, getCooldownRemaining, startCooldown, incrementActions])
+    }, [isAlive, walletAddress, stats.energy, stats.happiness, isOnCooldown, getCooldownRemaining, startCooldown, incrementActions])
 
     const sleep = useCallback(() => {
-        if (!isAlive) return
+        if (!isAlive || !walletAddress) return
 
         if (isOnCooldown('sleep')) {
             setMessage(`Wait ${formatCooldown(getCooldownRemaining('sleep'))}! 💤`)
@@ -354,7 +358,7 @@ export function usePetState(walletAddress = null) {
         setMessage('Zzz... 💤')
         startCooldown('sleep')
         incrementActions()
-    }, [isAlive, stats.energy, isOnCooldown, getCooldownRemaining, startCooldown, incrementActions])
+    }, [isAlive, walletAddress, stats.energy, isOnCooldown, getCooldownRemaining, startCooldown, incrementActions])
 
     const getMood = useCallback(() => {
         if (!isAlive) return 'dead'
