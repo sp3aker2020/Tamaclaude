@@ -8,6 +8,7 @@ import { ScoreDisplay } from './components/ScoreDisplay'
 import { GameOver } from './components/GameOver'
 import { usePetState } from './hooks/usePetState'
 import { getWalletHistory } from './api/client'
+import petSprites from './assets/pet-sprites.png'
 
 function Particles() {
   return (
@@ -58,7 +59,7 @@ function ClaimPetScreen({ onClaim, walletStats, petHistory }) {
         )}
 
         <div className="claim-pet-preview">
-          <img src="/src/assets/pet-sprites.png" alt="Your future pet" className="claim-pet-image" />
+          <img src={petSprites} alt="Your future pet" className="claim-pet-image" />
         </div>
 
         <button className="claim-btn" onClick={onClaim}>
@@ -96,7 +97,7 @@ function ConnectWalletScreen() {
         <p className="connect-subtitle">Your Solana-powered virtual pet</p>
 
         <div className="connect-pet-preview">
-          <img src="/src/assets/pet-sprites.png" alt="Tamaclaude pet" className="connect-pet-image" />
+          <img src={petSprites} alt="Tamaclaude pet" className="connect-pet-image" />
         </div>
 
         <p className="connect-info">Connect your Solana wallet to start playing!</p>
