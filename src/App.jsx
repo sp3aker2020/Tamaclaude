@@ -119,8 +119,13 @@ function ConnectWalletScreen() {
         <h1 className="connect-title">⚡ PokeClawd</h1>
         <p className="connect-subtitle">Open Claw Powered Pets</p>
 
-        <div className="connect-pet-preview">
-          <img src={previewPet.sprites.idle} alt="PokeClawd" className="connect-pet-image" />
+        <div className="connect-pet-showcase">
+          {PET_LIST.slice(0, 2).map(pet => (
+            <div key={pet.id} className="connect-pet-item">
+              <img src={pet.sprites.idle} alt={pet.name} className="connect-pet-image" />
+              <span className="connect-pet-name">{pet.name}</span>
+            </div>
+          ))}
         </div>
 
         <p className="connect-info">Connect your Solana wallet to catch your first PokeClawd!</p>
