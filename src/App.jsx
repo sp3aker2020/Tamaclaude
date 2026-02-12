@@ -155,7 +155,8 @@ function App() {
   const {
     stats, action, message, mood, cooldowns,
     isAlive, score, highScores,
-    feed, play, sleep, restartGame
+    feed, play, sleep, restartGame,
+    setCustomMessage
   } = usePetState(walletAddress, selectedPetType)
 
   // Load selected pet type from localStorage
@@ -218,6 +219,10 @@ function App() {
     setHasClaimed(false)
   }
 
+  const handleBattle = () => {
+    setCustomMessage("PvP Battle Arena coming soon! ⚔️")
+  }
+
   // Not connected - show connect screen
   if (!connected) {
     return (
@@ -274,6 +279,7 @@ function App() {
             onFeed={feed}
             onPlay={play}
             onSleep={sleep}
+            onBattle={handleBattle}
             disabled={!isAlive}
             cooldowns={cooldowns}
           />

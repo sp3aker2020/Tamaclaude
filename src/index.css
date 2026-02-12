@@ -421,6 +421,21 @@ body::before {
   box-shadow: 0 0 20px rgba(46, 204, 113, 0.3);
 }
 
+.action-btn.battle {
+  border-top: 2px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(135deg, rgba(255, 0, 0, 0.1) 0%, rgba(100, 0, 0, 0.3) 100%);
+}
+
+.action-btn.battle:hover:not(:disabled) {
+  border-color: #ff0055;
+  box-shadow: 0 0 25px rgba(255, 0, 85, 0.4);
+  transform: translateY(-4px) scale(1.05);
+}
+
+.action-btn.battle .icon {
+  filter: drop-shadow(0 0 5px #ff0055);
+}
+
 /* Cooldown Timer Styles */
 .action-btn.on-cooldown {
   position: relative;

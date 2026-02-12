@@ -371,6 +371,7 @@ export function usePetState(walletAddress = null, petType = null) {
 
     return {
         stats, action, message, mood: getMood(), isAlive,
+        setCustomMessage: setMessage,
         score: { current: getCurrentScore(), actionsCompleted: score.actionsCompleted, timeAlive: getTimeAlive() },
         highScores, cooldowns: { feed: getCooldownRemaining('feed'), play: getCooldownRemaining('play'), sleep: getCooldownRemaining('sleep') },
         feed, play, sleep, restartGame

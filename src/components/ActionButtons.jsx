@@ -1,4 +1,4 @@
-export function ActionButtons({ onFeed, onPlay, onSleep, disabled, cooldowns }) {
+export function ActionButtons({ onFeed, onPlay, onSleep, onBattle, disabled, cooldowns }) {
     const formatCooldown = (seconds) => {
         if (seconds <= 0) return null
         return `${seconds}s`
@@ -40,6 +40,14 @@ export function ActionButtons({ onFeed, onPlay, onSleep, disabled, cooldowns }) 
                 {cooldowns.sleep > 0 && (
                     <span className="cooldown-timer">{formatCooldown(cooldowns.sleep)}</span>
                 )}
+            </button>
+            <button
+                className={`action-btn battle`}
+                onClick={onBattle}
+                disabled={disabled}
+            >
+                <span className="icon">⚔️</span>
+                <span className="label">Battle</span>
             </button>
         </div>
     )
